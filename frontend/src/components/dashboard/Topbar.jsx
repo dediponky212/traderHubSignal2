@@ -1,32 +1,70 @@
-import { Menu } from "lucide-react";
 import Button from "../ui/Button";
 import { useSidebar } from "../../context/SidebarContext";
-import {
+import useMediaQuery from "../../hooks/useMediaQuery";
+import {PanelLeftClose, PanelLeftOpen,Menu,
     Bell,
     Search,
     Cpu,
     Circle,
 } from "lucide-react";
-
 import Input from "../form/Input";
 
 export default function Topbar() {
-    const { toggleSidebar } = useSidebar();
+    
+const isDesktop = useMediaQuery("(min-width: 1024px)");
+    const {toggleSidebar,
+        isOpen,
+        closeSidebar,
+        collapsed,
+        toggleCollapse,
+        sidebarWidth,
+    } = useSidebar();
     return (
-        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
+            <header
+                style={{
+                    left: isDesktop ? `${sidebarWidth}px` : "0",
+                    width: isDesktop
+                        ? `calc(100% - ${sidebarWidth}px)`
+                        : "100%",
+                }}
+                className="
+                    fixed
+                    top-0
+                    right-0
+                    z-30
+                    h-16
+                    border-b
+                    border-slate-200
+                    bg-white
+                    px-6
+                    flex
+                    items-center
+                    justify-between
+                    transition-all
+                    duration-300
+                "
+            >
             <div className="flex items-center gap-3">
+                <Button className="lg:hidden p-2" onClick={toggleSidebar}>
+                    <Menu size={20} />
+                </Button>
+            </div>
 
             <Button
-                className="lg:hidden p-2"
-                onClick={toggleSidebar}
+                unstyled
+                className="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white"
+                onClick={toggleCollapse}
             >
-                <Menu size={20} />
+                {collapsed ? (
+                    <PanelLeftOpen size={20} />
+                ) : (
+                    <PanelLeftClose size={20} />
+                )}
             </Button>
 
-        </div>
-
             {/* Search */}
-            <div className="w-full max-w-md">
+            {/* <div className="flex flex-1 px-4"> */}
+            <div className="w-full max-w-md pl-2">
                 <div className="relative">
                     <Search
                         size={18}

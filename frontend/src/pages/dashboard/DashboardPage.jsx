@@ -1,12 +1,13 @@
 import PageHeader from "../../components/ui/PageHeader";
-
+import MarketTicker from "../../components/dashboard/MarketTicker";
+import RobotCarousel from "../../components/dashboard/RobotCarousel";
 export default function DashboardPage() {
     return (
         <>
-            <PageHeader
-                title="Dashboard"
-                subtitle="Welcome back to Forex Hub."
-            />
+            <div className="space-y-6">
+                 <MarketTicker />
+                 <RobotCarousel />
+            </div>
 
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
