@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { TrendingUp, Award, BarChart3, Activity, ArrowUpRight, ArrowDownRight, Zap, ArrowLeft } from 'lucide-react';
+import { TrendingUp, Award, BarChart3, Activity, ArrowUpRight, ArrowDownRight, Zap, ArrowLeft, LogOut, Home } from 'lucide-react';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
   const [trades, setTrades] = useState([]);
   const [stats, setStats] = useState({ totalProfit: 0, winRate: 0, totalTrades: 0 });
 
@@ -28,11 +34,13 @@ export default function Dashboard() {
   }, []);
 
   // Logika Matematika Performa Akun
+// Logika Matematika Performa Akun yang Kebal Error Data Kosong
   const hitungStatistik = (data) => {
-    if (data.length === 0) return;
-    const closedTrades = data.filter(t => t.status === 'CLOSE');
-    const totalPnl = closedTrades.reduce((acc, curr) => acc + curr.pnl, 0);
-    const winTrades = closedTrades.filter(t => t.pnl > 0).length;
+    if (!Array.isArray(data) || data.length === 0) return;
+    
+    const closedTrades = data.filter(t => t && t.status === 'CLOSE');
+    const totalPnl = closedTrades.reduce((acc, curr) => acc + (Number(curr.pnl) || 0), 0);
+    const winTrades = closedTrades.filter(t => (Number(t.pnl) || 0) > 0).length;
     const winRate = closedTrades.length > 0 ? (winTrades / closedTrades.length) * 100 : 0;
 
     setStats({
@@ -53,16 +61,38 @@ export default function Dashboard() {
             </div>
             <span className="font-semibold text-lg tracking-tight">ForexHub <span className="text-slate-400 font-normal">Console</span></span>
           </div>
-          <div className="flex items-center gap-4">
-            {/* Tombol Navigasi Kembali ke Landing Page Publik */}
-            <Link to="/" className="text-sm text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition-colors mr-3">
-              <ArrowLeft className="w-4 h-4" /> Landing Page
-            </Link>
-            <span className="text-xs bg-emerald-50 text-emerald-700 font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              MT5 Bridge Connected
-            </span>
-          </div>
+
+  <div>
+    <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
+      ForexHub Analytics
+    </h1>
+    <p className="text-xs sm:text-sm text-slate-500 mt-1">
+      Monitoring data transaksi MT5 secara real-time
+    </p>
+  </div>
+
+    <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end pt-3 sm:pt-0 border-t border-slate-100 sm:border-t-0">
+    <a href="/" className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+      <Home className="w-4 h-4 text-slate-400" />
+      Home Page
+    </a>
+    
+    {/* Garis Pembatas Vertikal (Otomatis disembunyikan di HP, muncul di Desktop) */}
+    <div className="hidden sm:block h-4 w-[1px] bg-slate-200"></div> 
+    
+    <button 
+      onClick={handleLogout}
+      className="flex items-center gap-1.5 text-sm font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95"
+    >
+      <LogOut className="w-4 h-4" />
+      Logout
+    </button>
+  </div>
+
+
+
+
+
         </div>
       </nav>
 
@@ -80,8 +110,11 @@ export default function Dashboard() {
               <span className="text-sm font-medium text-slate-500">Net Accumulation</span>
               <TrendingUp className="w-5 h-5 text-indigo-500" />
             </div>
-            <div className={`text-3xl font-bold tracking-tight ${stats.totalProfit >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-              {stats.totalProfit >= 0 ? `+$${stats.totalProfit.toFixed(2)}` : `-$${Math.abs(stats.totalProfit).toFixed(2)}`}
+            {/* GANTI BLOK DIV TOTAL PROFIT ANDA DENGAN VERSI AMAN INI */}
+            <div className={`text-3xl font-bold tracking-tight ${(stats?.totalProfit || 0) >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+              {(stats?.totalProfit || 0) >= 0 
+                ? `+$${(Number(stats?.totalProfit) || 0).toFixed(2)}` 
+                : `-$${Math.abs(Number(stats?.totalProfit) || 0).toFixed(2)}`}
             </div>
             <p className="text-xs text-slate-400 mt-2">Berdasarkan data closed positions</p>
           </div>
@@ -93,7 +126,7 @@ export default function Dashboard() {
             </div>
             <div className="text-3xl font-bold tracking-tight text-slate-900">{stats.winRate}%</div>
             <div className="w-full bg-slate-100 h-2 rounded-full mt-3 overflow-hidden">
-              <div className="bg-indigo-600 h-full transition-all duration-500" style={{ width: `${stats.winRate}%` }}></div>
+              <div className="bg-indigo-600 h-full transition-all duration-500" style={{ width: `${Math.round(stats?.winRate || 0)}%` }}></div>
             </div>
           </div>
 
@@ -128,7 +161,7 @@ export default function Dashboard() {
                   <th className="py-3 px-6 text-right">P&L ($)</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+                <tbody className="divide-y divide-slate-100 text-sm">
                 {trades.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="text-center py-12 text-slate-400 font-medium">
@@ -136,35 +169,44 @@ export default function Dashboard() {
                     </td>
                   </tr>
                 ) : (
-                  trades.map((trade) => (
-                    <tr key={trade.id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="py-3.5 px-6 font-mono text-xs text-slate-400">#{trade.ticket}</td>
-                      <td className="py-3.5 px-6 font-semibold text-slate-900">{trade.symbol}</td>
-                      <td className="py-3.5 px-6">
-                        <span className={`inline-flex items-center gap-1 font-medium ${trade.action.includes('BUY') ? 'text-indigo-600' : 'text-amber-700'}`}>
-                          {trade.action.includes('BUY') ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-                          {trade.action}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-6">
-                        <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
-                          trade.status === 'OPEN' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                          trade.status === 'MODIFY' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                          'bg-slate-100 text-slate-700 border-slate-300'
+                  trades.map((trade) => {
+                    // Amankan variabel data dari null/undefined sebelum dirender
+                    const actionText = trade?.action || '';
+                    const isBuy = actionText.includes('BUY');
+                    const volumeValue = Number(trade?.volume || 0).toFixed(2);
+                    const priceValue = Number(trade?.price || 0).toFixed(5);
+                    const pnlValue = Number(trade?.pnl || 0);
+
+                    return (
+                      <tr key={trade?.id || trade?.ticket} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="py-3.5 px-6 font-mono text-xs text-slate-400">#{trade?.ticket || '0000'}</td>
+                        <td className="py-3.5 px-6 font-semibold text-slate-900">{trade?.symbol || '-'}</td>
+                        <td className="py-3.5 px-6">
+                          <span className={`inline-flex items-center gap-1 font-medium ${isBuy ? 'text-indigo-600' : 'text-amber-700'}`}>
+                            {isBuy ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                            {actionText || 'UNKNOWN'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-6">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium border ${
+                            trade?.status === 'OPEN' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                            trade?.status === 'MODIFY' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                            'bg-slate-100 text-slate-700 border-slate-300'
+                          }`}>
+                            {trade?.status || 'PENDING'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-6 text-right font-mono text-slate-600">{volumeValue}</td>
+                        <td className="py-3.5 px-6 text-right font-mono text-slate-600">{priceValue}</td>
+                        <td className={`py-3.5 px-6 text-right font-mono font-semibold ${
+                          trade?.status !== 'CLOSE' ? 'text-slate-400 font-normal' :
+                          pnlValue >= 0 ? 'text-emerald-600' : 'text-rose-600'
                         }`}>
-                          {trade.status}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-6 text-right font-mono text-slate-600">{trade.volume.toFixed(2)}</td>
-                      <td className="py-3.5 px-6 text-right font-mono text-slate-600">{trade.price.toFixed(5)}</td>
-                      <td className={`py-3.5 px-6 text-right font-mono font-semibold ${
-                        trade.status !== 'CLOSE' ? 'text-slate-400 font-normal' :
-                        trade.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600'
-                      }`}>
-                        {trade.status !== 'CLOSE' ? '-' : trade.pnl >= 0 ? `+$${trade.pnl.toFixed(2)}` : `-$${Math.abs(trade.pnl).toFixed(2)}`}
-                      </td>
-                    </tr>
-                  ))
+                          {trade?.status !== 'CLOSE' ? '-' : pnlValue >= 0 ? `+$${pnlValue.toFixed(2)}` : `-$${Math.abs(pnlValue).toFixed(2)}`}
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

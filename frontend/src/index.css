@@ -1,0 +1,13 @@
+@import "tailwindcss";
+body{
+    background:var(--color-bg);
+    color:var(--color-text);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
