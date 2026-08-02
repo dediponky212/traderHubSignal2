@@ -7,6 +7,7 @@ import DashboardPage from "./pages/dashboard/DashboardPage";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 //import RegisterPage from "./pages/RegisterPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 function App() {
     return (
@@ -24,7 +25,14 @@ function App() {
                 </Route>
 
                 <Route element={<DashboardLayout />}>
-                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <DashboardPage />
+                            </ProtectedRoute>
+                        }
+                    />
                 </Route>
 
             </Routes>

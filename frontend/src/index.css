@@ -11,3 +11,7 @@ body{
 html{
     scroll-behavior:smooth;
 }
+/* Hide horizontal scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}

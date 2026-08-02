@@ -13,6 +13,10 @@ import { LayoutDashboard,
 } from "lucide-react";
 import { navigation } from "../../config/navigation";
 import useMediaQuery from "../../hooks/useMediaQuery";
+
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
 export default function Sidebar() {
     const isDesktop = useMediaQuery("(min-width: 1024px)");
     const {
@@ -22,6 +26,12 @@ export default function Sidebar() {
     toggleCollapse,
     sidebarWidth,
 } = useSidebar();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const handleLogout = () => {
+        logout();
+        navigate("/login", { replace: true });
+    };
     return (
         <aside style={{
                 width: `${sidebarWidth}px`,
@@ -143,8 +153,8 @@ export default function Sidebar() {
                     </div>
                     {!collapsed && (
                     <div>
-                        <h4 className="font-semibold">Admin</h4>
-                        <p className="text-sm text-slate-500">admin@forexhub.ai</p>
+                        <h4 className="font-semibold">{user?.fullname}</h4>
+                        <p className="text-sm text-slate-500">{user?.email}</p>
 
                     </div>
                     )}

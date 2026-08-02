@@ -6,8 +6,15 @@ import {PanelLeftClose, PanelLeftOpen,Menu,
     Search,
     Cpu,
     Circle,
+    User,
+    Settings,
+    LogOut,
 } from "lucide-react";
 import Input from "../form/Input";
+
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useEffect, useRef, useState } from "react";
 
 export default function Topbar() {
     
@@ -19,6 +26,33 @@ const isDesktop = useMediaQuery("(min-width: 1024px)");
         toggleCollapse,
         sidebarWidth,
     } = useSidebar();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const [openProfile, setOpenProfile] = useState(false);
+    const profileRef = useRef(null);
+    useEffect(() => {
+        function handleClickOutside(e) {
+            if (
+                profileRef.current &&
+                !profileRef.current.contains(e.target)
+            ) {
+                setOpenProfile(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+    }, []);
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login", { replace: true });
+    };
     return (
             <header
                 style={{
@@ -52,7 +86,7 @@ const isDesktop = useMediaQuery("(min-width: 1024px)");
 
             <Button
                 unstyled
-                className="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white"
+                className="hidden lg:flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white cursor-pointer"
                 onClick={toggleCollapse}
             >
                 {collapsed ? (
@@ -86,7 +120,7 @@ const isDesktop = useMediaQuery("(min-width: 1024px)");
                     />
                     AI Online
                 </div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-100 cursor-pointer">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-100 cursor-pointer ml-2">
                     <Cpu size={18} />
                 </div>
 
@@ -94,17 +128,53 @@ const isDesktop = useMediaQuery("(min-width: 1024px)");
                     <Bell size={18} />
                 </div>
 
-                <div className="hidden md:flex items-center gap-3 border-l border-slate-200 pl-4">
+                <div ref={profileRef} className="relative hidden md:block border-l border-slate-200 pl-4">
+                    <button
+                        onClick={() => setOpenProfile(!openProfile)}
+                        className="flex items-center gap-3 cursor-pointer">
 
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 font-semibold text-white">
-                        A
-                    </div>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 font-semibold text-white">
+                            {user?.fullname?.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="text-left">
+                            <p className="text-sm font-semibold text-slate-900">{user?.fullname}</p>
+                            <p className="text-xs text-slate-500">{user?.email}</p>
+                        </div>
+                    </button>
 
-                    <div>
-                        <p className="text-sm font-semibold text-slate-900"></p>
-                        <p className="text-xs text-slate-500">Premium Member</p>
-                    </div>
+                    {openProfile && (
+                        <div
+                            className="
+                                absolute
+                                right-0
+                                mt-3
+                                w-64
+                                overflow-hidden
+                                rounded-2xl
+                                border
+                                border-slate-200
+                                bg-white
+                                shadow-xl
+                            ">
+                                
+                            <button className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
+                                <User size={18} />
+                                My Profile
+                            </button>
+                            <button className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
+                                <Settings size={18} />
+                                Account Settings
+                            </button>
 
+                            <div className="border-t" />
+                            <button
+                                onClick={handleLogout}
+                                className="flex w-full items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 cursor-pointer">
+                                <LogOut size={18} />
+                                Logout
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

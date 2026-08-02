@@ -1,0 +1,42 @@
+export const economicEvents = [
+    {
+        id: 1,
+        time: "19:30",
+        currency: "USD",
+        impact: "high",
+        event: "Non Farm Payroll",
+        forecast: "185K",
+    },
+    {
+        id: 2,
+        time: "20:15",
+        currency: "EUR",
+        impact: "medium",
+        event: "ECB Interest Rate Decision",
+        forecast: "4.25%",
+    },
+    {
+        id: 3,
+        time: "21:00",
+        currency: "USD",
+        impact: "high",
+        event: "Fed Chair Speech",
+        forecast: "-",
+    },
+    {
+        id: 4,
+        time: "22:00",
+        currency: "CAD",
+        impact: "low",
+        event: "GDP m/m",
+        forecast: "0.2%",
+    },
+    {
+        id: 5,
+        time: "23:30",
+        currency: "AUD",
+        impact: "high",
+        event: "Employment Change",
+        forecast: "38K",
+    },
+];

@@ -1,9 +1,8 @@
+import { portfolios } from "../../data/portFolios";
+import PortFolioCard from "../dashboard/PortFolioCard";
 import { useEffect, useRef } from "react";
-import { robots } from "../../data/robots";
-import RobotCard from "./RobotCard";
-
-export default function RobotCarousel() {
-
+export default function PortfolioCarousel() {
+    
     const scrollRef = useRef(null);
 
     useEffect(() => {
@@ -59,7 +58,7 @@ export default function RobotCarousel() {
 
             }
 
-        }, 5000);
+        }, 3500);
 
         return () => {
 
@@ -72,28 +71,21 @@ export default function RobotCarousel() {
         };
 
     }, []);
-
     return (
-
         <section className="space-y-4">
-
             <div className="flex items-center justify-between">
-
                 <div>
-
                     <h2 className="text-2xl font-bold">
-                        🔥 Top AI Robots
+                        💼 Top Portfolios
                     </h2>
 
                     <p className="text-slate-500">
-                        Best AI Trading Robots this month
+                        Best performing portfolios
                     </p>
 
                 </div>
 
-                <button
-                    className="font-semibold text-blue-600 hover:underline"
-                >
+                <button className="text-blue-600 font-semibold hover:underline">
                     View All
                 </button>
 
@@ -120,11 +112,11 @@ export default function RobotCarousel() {
                 }}
             >
 
-                {robots.map((robot) => (
+                {portfolios.map((portfolio) => (
 
-                    <RobotCard
-                        key={robot.id}
-                        robot={robot}
+                    <PortFolioCard
+                        key={portfolio.id}
+                        portfolio={portfolio}
                     />
 
                 ))}

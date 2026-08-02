@@ -1,0 +1,7 @@
+.robot-carousel::-webkit-scrollbar{
+    display:none;
+}
+
+.robot-carousel{
+    scrollbar-width:none;
+}
