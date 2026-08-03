@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const db = require("../config/database");
 const { generateToken } = require("../utils/jwt");
+const { sendWelcomeEmail } = require("../utils/mailer");
+const User = require('../models/userModel');
 
 async function register(req, res) {
     const {
@@ -46,6 +48,8 @@ async function register(req, res) {
                         return res.status(500).json(err);
                     }
 
+                    sendWelcomeEmail(email, fullname, username);
+                    
                     res.status(201).json({
                         message: "User registered successfully",
                         id: this.lastID,
@@ -151,3 +155,5 @@ module.exports = {
     login,
     me,
 };
+
+//Gemini
