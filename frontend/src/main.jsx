@@ -9,6 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
 import "./styles/theme.css";
 import "./styles/carousel.css";
+import "./styles/marketTicker.css"
 
 createRoot(document.getElementById("root")).render(
     <StrictMode>

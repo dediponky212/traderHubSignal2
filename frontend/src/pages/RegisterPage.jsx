@@ -1,10 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Navigate } from "react-router-dom";
 import { useState } from "react";
 
 import Input from "../components/form/Input";
 import { register } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
+    const {user} = useAuth();
+        if(user) {
+            return <Navigate to="/dashboard" replace/>;
+        }
     const navigate = useNavigate();
     const [form, setForm] = useState({
         fullname: "",

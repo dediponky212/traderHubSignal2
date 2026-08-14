@@ -37,27 +37,20 @@ const items = [
 export default function Trusted() {
     return (
         <section className="py-20">
-
             <div className="max-w-7xl mx-auto px-6">
 
                 <p className="text-center text-slate-500 font-medium tracking-widest uppercase">
-
                     Built With Modern Technology
-
                 </p>
 
                 <div className="mt-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
 
                     {items.map((item, index) => {
-
                         const Icon = item.icon;
-
                         return (
-
                             <div
                                 key={index}
-                                className="rounded-2xl border border-slate-200 bg-white p-6 hover:border-blue-300 hover:shadow-lg transition-all duration-300 flex flex-col items-center"
-                            >
+                                className="rounded-2xl border border-slate-200 bg-white p-6 hover:border-blue-300 hover:shadow-lg transition-all duration-300 flex flex-col items-center">
 
                                 <Icon
                                     size={34}
@@ -65,21 +58,15 @@ export default function Trusted() {
                                 />
 
                                 <p className="mt-4 font-semibold text-slate-700">
-
                                     {item.title}
-
                                 </p>
-
                             </div>
-
                         );
-
                     })}
 
                 </div>
 
             </div>
-
         </section>
     );
 }

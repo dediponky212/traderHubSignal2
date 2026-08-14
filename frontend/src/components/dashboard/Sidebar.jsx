@@ -52,17 +52,14 @@ export default function Sidebar() {
                 ${isOpen ? "translate-x-0" : "-translate-x-full"}
                 lg:translate-x-0
                 lg:translate-x-0
-            `}
-        >
+            `}>
 
             {/* Logo */}
-            <div
-                className={`flex h-16 items-center border-b border-slate-200 ${
+            <div className={`flex h-16 items-center border-b border-slate-200 ${
                     collapsed ? "justify-center px-2" : "justify-between px-6"
                 }`}
             >
                 <div className="flex items-center">
-
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
                         <TrendingUp size={20} />
                     </div>
@@ -124,6 +121,8 @@ export default function Sidebar() {
                                             shadow-lg
                                             transition-all
                                             group-hover:opacity-100
+                                            pl-2
+                                            pr-2
                                         "
                                     >
                                         {menu.title}
@@ -160,13 +159,15 @@ export default function Sidebar() {
                     )}
                 </div>
 
-                <button onClick={closeSidebar} className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 py-3 transition hover:bg-slate-100">
+                <button onClick={closeSidebar} className="cursor-pointer flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 py-3 transition hover:bg-slate-100">
                     <LogOut size={18} />
-                    {!collapsed && <span>Logout</span>}
+                    {!collapsed && <span onClick={handleLogout}>Logout</span>}
                 </button>
 
             </div>
 
         </aside>
+
+        
     );
 }

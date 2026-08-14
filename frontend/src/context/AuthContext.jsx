@@ -4,7 +4,6 @@ import * as authService from "../services/authService";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -40,11 +39,8 @@ export function AuthProvider({ children }) {
     };
 
     const logout = () => {
-
         localStorage.removeItem("token");
-
         setUser(null);
-
     };
 
     return (
@@ -54,12 +50,10 @@ export function AuthProvider({ children }) {
                 loading,
                 login,
                 logout,
-            }}
-        >
+            }}>
             {children}
         </AuthContext.Provider>
     );
-
 }
 
 export const useAuth = () =>

@@ -3,21 +3,40 @@ import { TrendingUp } from "lucide-react";
 
 export default function Navbar() {
     return (
-        <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/80 backdrop-blur-lg">
-            <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6">
+        <header className="
+                        sticky
+                        top-0
+                        z-50
+                        border-b
+                        border-slate-200/70
+                        bg-white/80
+                        backdrop-blur-lg">
+            <div className="
+                        mx-auto flex
+                        h-18
+                        max-w-7xl
+                        items-center
+                        justify-between
+                        px-6">
 
                 {/* Logo */}
-                <Link
-                    to="/"
-                    className="flex items-center gap-3"
-                >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md">
+                <Link to="/" className="flex items-center gap-3">
+                    <div className="
+                                flex
+                                h-10
+                                w-10
+                                items-center
+                                justify-center
+                                rounded-xl
+                                bg-blue-600
+                                text-white
+                                shadow-md">
                         <TrendingUp size={20} />
                     </div>
 
                     <div>
                         <h1 className="text-lg font-bold tracking-tight text-slate-800">
-                            Forex Hub
+                            TraderHub
                         </h1>
 
                         <p className="text-xs text-slate-500">
@@ -28,28 +47,17 @@ export default function Navbar() {
 
                 {/* Menu */}
                 <nav className="hidden items-center gap-8 lg:flex">
-
-                    <NavLink
-                        to="/"
-                        className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
-                    >
-                        Home
+                    <NavLink to="/" className="text-sm font-medium text-slate-600 transition hover:text-blue-600">
+                    Home
                     </NavLink>
 
-                    <NavLink
-                        to="/about"
-                        className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
-                    >
-                        About
+                    <NavLink to="/about" className="text-sm font-medium text-slate-600 transition hover:text-blue-600">
+                    About
                     </NavLink>
 
-                    <NavLink
-                        to="/features"
-                        className="text-sm font-medium text-slate-600 transition hover:text-blue-600"
-                    >
+                    <NavLink to="/features" className="text-sm font-medium text-slate-600 transition hover:text-blue-600">
                         Features
                     </NavLink>
-
                 </nav>
 
                 {/* Right */}

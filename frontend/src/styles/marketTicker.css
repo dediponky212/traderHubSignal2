@@ -2,25 +2,19 @@
     overflow: hidden;
     position: relative;
 }
-
 .market-track {
     display: flex;
     width: max-content;
     gap: 12px;
-
     animation: ticker-scroll 35s linear infinite;
 }
-
 .market-track:hover {
     animation-play-state: paused;
 }
-
 .market-ticker:active .market-track {
     animation-play-state: paused;
 }
-
 @keyframes ticker-scroll {
-
     from {
         transform: translateX(0);
     }
@@ -28,15 +22,12 @@
     to {
         transform: translateX(-50%);
     }
-
 }
 
 /* Hide Scrollbar */
-
 .market-ticker::-webkit-scrollbar {
     display: none;
 }
-
 .market-ticker {
     scrollbar-width: none;
 }

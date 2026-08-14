@@ -6,6 +6,10 @@ import {
     BarChart3,
     Bell,
     Settings,
+    Calendar,
+    Inbox,
+    MessageCircle,
+    UsersIcon,
 } from "lucide-react";
 
 export const navigation = [
@@ -35,9 +39,19 @@ export const navigation = [
         path: "/portfolio",
     },
     {
-        title: "Notifications",
-        icon: Bell,
+        title: "Calendar",
+        icon: Calendar,
+        path: "/calendar",
+    },
+    {
+        title: "Messege",
+        icon: MessageCircle,
         path: "/notifications",
+    },
+    {
+        title: "Community",
+        icon: UsersIcon,
+        path: "/community",
     },
     {
         title: "Settings",

@@ -157,11 +157,11 @@ const isDesktop = useMediaQuery("(min-width: 1024px)");
                                 shadow-xl
                             ">
                                 
-                            <button className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
+                            <button onClick={() => navigate("/profile")} className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
                                 <User size={18} />
                                 My Profile
                             </button>
-                            <button className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
+                            <button onClick={() => navigate("/accountSetting")} className="flex w-full items-center gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer">
                                 <Settings size={18} />
                                 Account Settings
                             </button>

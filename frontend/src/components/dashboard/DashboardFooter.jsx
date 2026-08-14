@@ -21,7 +21,7 @@ export default function DashboardFooter() {
             <div className="flex flex-col items-center gap-5">
 
                 <p className="text-center text-slate-400">
-                    Powered by <span className="font-semibold text-violet-600">Artificial Intelligence</span> for Smarter Trading
+                    Powered by <span className="font-semibold text-violet-600">Dedi Wrj</span> for Smarter Trading
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center gap-6">

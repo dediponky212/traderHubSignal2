@@ -16,6 +16,7 @@ export default function Button({
             font-semibold
             transition-all
             duration-300
+            cursor-pointer
         `;
 
     const variants = {
