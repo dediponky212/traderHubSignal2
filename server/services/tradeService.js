@@ -1,4 +1,5 @@
 const db = require("../config/database");
+const signalService = require("../services/signalService");
 
 function getAccount(accountNumber) {
     return new Promise((resolve, reject) => {
@@ -9,7 +10,8 @@ function getAccount(accountNumber) {
                 account_number,
                 connected,
                 balance,
-                equity
+                equity,
+                ea_role
             FROM mt_accounts
             WHERE account_number = ?`,
             [accountNumber],
@@ -34,24 +36,54 @@ exports.saveTrade = async (data) => {
     data.account_id = account.id;
     data.balance = account.balance;
     data.equity = account.equity;
+    let result;
     switch (data.event) {
         case "OPEN":
-            return await insertTrade(data);
+            result = await insertTrade(data);
+            break;
         case "MODIFY":
-            return await updateTrade(data);
+            result = await updateTrade(data);
+            break;
         case "CLOSE":
-            return await closeTrade(data);
+            result = await closeTrade(data);
+            break;
         case "PENDING_ADD":
         case "PENDING_UPDATE":
         case "PENDING_DELETE":
-            return await pendingTrade(data);
+            result = await pendingTrade(data);
+            break;
         default:
             return {
                 success: false,
                 message: "Unknown event."
             };
     }
+    //Hanya master yang menjadi sumber signal
+    if (result.success && account.ea_role === "MASTER") {
+        await signalService.createSignal(buildSignalData(data, account));
+    }
+    return result;
 };
+
+function buildSignalData(data, account) {
+    let type = "UNKNOWN";
+
+    if (data.event === "OPEN") type = "OPEN";
+    else if (data.event === "MODIFY") type = "MODIFY";
+    else if (data.event === "CLOSE") type = "CLOSE";
+
+    return {
+        master_account_id: account.id,
+        symbol: data.symbol,
+        type,
+        action: data.action || "",
+        price_from: data.price || 0,
+        price_to: data.price || 0,
+        sl: data.sl || 0,
+        tp: data.tp || 0,
+        source: "EA"
+    };
+}
 
 function insertTrade(data) {
     return new Promise((resolve, reject) => {

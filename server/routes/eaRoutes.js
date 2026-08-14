@@ -5,13 +5,15 @@ const {
     connect,
     heartbeat,
     trade,
-    commandAck
+    commandAck,
+    signalAck
 } = require("../controllers/eaController");
 
 router.post("/connect", connect);
 router.post("/heartbeat", heartbeat);
 router.post("/trade", trade);
 router.post("/command/ack", commandAck);
+router.post("/signal/ack", signalAck);
 // router.post("/disconnect", disconnect);
 
 module.exports = router;

@@ -96,17 +96,21 @@ exports.connect = (req, res) => {
     );
 
 };
+
 exports.heartbeat = (req, res) => {
+
     const {
         account_number,
         balance,
         equity,
         margin,
         free_margin,
-        margin_level,
+        margin_level
     } = req.body;
 
-    db.get(`SELECT
+    db.get(
+        `
+        SELECT
             mt_accounts.*,
             ea_settings.ea_enabled,
             ea_settings.follow_signal,
@@ -116,30 +120,47 @@ exports.heartbeat = (req, res) => {
         FROM mt_accounts
         JOIN ea_settings
             ON mt_accounts.user_id = ea_settings.user_id
-        WHERE mt_accounts.account_number = ?`,
+        WHERE mt_accounts.account_number = ?
+        `,
         [account_number],
+
         (err, account) => {
 
+            // =========================
+            // ACCOUNT ERROR
+            // =========================
             if (err) {
                 return res.status(500).json({
                     success: false,
                     connected: false,
                     activated: false,
+                    commands: [],
+                    signals: [],
                     message: err.message
                 });
             }
 
+            // =========================
+            // ACCOUNT NOT FOUND
+            // =========================
             if (!account) {
                 return res.status(404).json({
                     success: false,
                     connected: false,
                     activated: false,
+                    commands: [],
+                    signals: [],
                     message: "Account not found"
                 });
             }
 
-            // Update kondisi akun
-            db.run(`UPDATE mt_accounts SET
+            // =========================
+            // UPDATE ACCOUNT STATUS
+            // =========================
+            db.run(
+                `
+                UPDATE mt_accounts
+                SET
                     balance = ?,
                     equity = ?,
                     margin = ?,
@@ -160,68 +181,132 @@ exports.heartbeat = (req, res) => {
                 ]
             );
 
-            // Ambil command yang masih pending
-            db.all(`SELECT
-                        id,
-                        command,
-                        payload
-                    FROM ea_commands
-                    WHERE account_id = ?
-                    AND status = 'pending'
-                    ORDER BY id ASC
-                    LIMIT 20`,
-                [account.id],
-                (err, commands) => {
+            // =========================
+            // ROLE
+            // =========================
+            const role = account.ea_role;
 
-                    if (err) {
+            // =========================
+            // ACTIVATION
+            // =========================
+            const activated = account.ea_enabled === 1;
+
+            // =========================
+            // COMMAND
+            // SEMUA ROLE BOLEH
+            // =========================
+            db.all(
+                `
+                SELECT
+                    id,
+                    command,
+                    payload
+                FROM ea_commands
+                WHERE account_id = ?
+                  AND status = 'pending'
+                ORDER BY id ASC
+                LIMIT 1
+                `,
+                [account.id],
+
+                (commandErr, commands) => {
+
+                    if (commandErr) {
                         return res.status(500).json({
                             success: false,
-                            message: err.message
+                            connected: true,
+                            activated,
+                            heartbeat: 5,
+                            status: role,
+                            commands: [],
+                            signals: [],
+                            message: commandErr.message
                         });
                     }
-                    if (!commands || commands.length === 0) {
+
+                    commands = commands || [];
+
+                    // =========================
+                    // BUKAN FOLLOWER
+                    // TIDAK PERLU SIGNAL
+                    // =========================
+                    if (role !== "FOLLOWER") {
+
                         return res.json({
                             success: true,
                             connected: true,
-                            activated: account.ea_enabled === 1,
+                            activated,
                             heartbeat: 5,
-                            status: account.ea_role,
-                            commands: [],
+                            status: role,
+                            commands,
+                            signals: [],
                             message: "Heartbeat OK"
                         });
                     }
-                    const ids = commands.map(c => c.id);
-                    const placeholders = ids.map(() => "?").join(",");
 
-                    db.run(`UPDATE ea_commands SET
-                            status = 'sent',
-                            sent_at = CURRENT_TIMESTAMP
-                        WHERE id IN (${placeholders}) `,
-                        ids,
-                        function(updateErr) {
-                            if (updateErr) {
+                    // =========================
+                    // FOLLOWER
+                    // AMBIL SIGNAL
+                    // =========================
+                    db.all(
+                        `
+                        SELECT
+                            sd.id,
+                            sd.signal_id,
+                            s.symbol,
+                            s.type,
+                            s.action,
+                            s.price_from,
+                            s.price_to,
+                            s.sl,
+                            s.tp,
+                            s.source,
+                            s.created_at
+                        FROM signal_deliveries sd
+                        JOIN signals s
+                            ON s.id = sd.signal_id
+                        WHERE sd.follower_account_id = ?
+                          AND sd.status = 'pending'
+                        ORDER BY sd.id ASC
+                        LIMIT 1
+                        `,
+                        [account.id],
+
+                        (signalErr, signals) => {
+
+                            if (signalErr) {
                                 return res.status(500).json({
                                     success: false,
-                                    message: updateErr.message
+                                    connected: true,
+                                    activated,
+                                    heartbeat: 5,
+                                    status: role,
+                                    commands,
+                                    signals: [],
+                                    message: signalErr.message
                                 });
                             }
+
+                            signals = signals || [];
+
                             return res.json({
                                 success: true,
                                 connected: true,
-                                activated: account.ea_enabled === 1,
+                                activated,
                                 heartbeat: 5,
-                                status: account.ea_role,
-                                commands: commands,
+                                status: role,
+                                commands,
+                                signals,
                                 message: "Heartbeat OK"
                             });
                         }
                     );
                 }
             );
-
         }
     );
 };
+
 exports.trade = async (req, res) => {
     try {
         const result = await tradeService.saveTrade(req.body);
@@ -233,6 +318,7 @@ exports.trade = async (req, res) => {
         });
     }
 };
+
 exports.commandAck = (req, res) => {
     const {
         command_id,
@@ -263,6 +349,48 @@ exports.commandAck = (req, res) => {
             return res.json({
                 success: true,
                 message: "Command ACK saved."
+            });
+        }
+    );
+};
+
+exports.signalAck = (req, res) => {
+
+    const {
+        signal_id,
+        success
+    } = req.body;
+
+    if (!success) {
+        return res.json({
+            success: true,
+            message: "Signal rejected by EA."
+        });
+    }
+
+    db.run(
+        `
+        UPDATE signal_deliveries
+        SET
+            status = 'executed',
+            received_at = CURRENT_TIMESTAMP,
+            executed_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+          AND status = 'pending'
+        `,
+        [signal_id],
+        function(err) {
+
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: err.message
+                });
+            }
+
+            return res.json({
+                success: true,
+                message: "Signal marked executed."
             });
         }
     );

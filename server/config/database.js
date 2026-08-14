@@ -203,7 +203,43 @@ db.run(`
     CREATE INDEX IF NOT EXISTS idx_integration_user
     ON integration_channels(user_id);
 `);
-
+// Table signal
+db.run(`
+    CREATE TABLE IF NOT EXISTS signals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        master_account_id INTEGER NOT NULL,
+        symbol TEXT NOT NULL,
+        type TEXT NOT NULL,
+        action TEXT NOT NULL,
+        price_from REAL,
+        price_to REAL,
+        sl REAL,
+        tp REAL,
+        source TEXT DEFAULT 'EA',
+        status TEXT DEFAULT 'CREATED',
+        blocked_reason TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        sent_at DATETIME,
+        FOREIGN KEY(master_account_id) REFERENCES mt_accounts(id)
+    );
+`);
+// table signal deliveries
+db.run(`
+    CREATE TABLE IF NOT EXISTS signal_deliveries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        signal_id INTEGER NOT NULL,
+        master_account_id INTEGER NOT NULL,
+        follower_account_id INTEGER NOT NULL,
+        status TEXT DEFAULT 'pending',
+        sent_at DATETIME,
+        received_at DATETIME,
+        executed_at DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(signal_id) REFERENCES signals(id),
+        FOREIGN KEY(master_account_id) REFERENCES mt_accounts(id),
+        FOREIGN KEY(follower_account_id) REFERENCES mt_accounts(id)
+    );
+`);
 
 });
 
