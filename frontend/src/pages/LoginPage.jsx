@@ -35,9 +35,12 @@ export default function LoginPage() {
         <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
             <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
 
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
-                    <p className="mt-3 text-slate-500">Login ke akun Forex Hub Anda.</p>
+                <div className="mb-8 flex flex-col items-center gap-4">
+                    <img src="/img/logo.png" alt="TraderHub" className="h-12 w-12 rounded-xl shadow-md" />
+                    <div className="text-center">
+                        <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
+                        <p className="mt-3 text-slate-500">Login ke akun Forex Hub Anda.</p>
+                    </div>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">

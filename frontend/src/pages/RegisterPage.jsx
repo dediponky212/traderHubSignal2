@@ -90,9 +90,12 @@ export default function RegisterPage() {
             {/* --------------------------- */}
 
             <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold">Create Account</h1>
-                    <p className="mt-2 text-slate-500">Join ForexHub today.</p>
+                <div className="mb-8 flex flex-col items-center gap-4">
+                    <img src="/img/logo.png" alt="TraderHub" className="h-12 w-12 rounded-xl shadow-md" />
+                    <div className="text-center">
+                        <h1 className="text-3xl font-bold">Create Account</h1>
+                        <p className="mt-2 text-slate-500">Join ForexHub today.</p>
+                    </div>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
