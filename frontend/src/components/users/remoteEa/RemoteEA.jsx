@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PageHeader from "../../ui/PageHeader";
 import MarketTicker from "../../dashboard/MarketTicker";
 import DashboardFooter from "../../dashboard/DashboardFooter";
-import SidebarRight from "../../dashboard/SidebarRight";
+import SidebarRight from "../../layout/SidebarRight";
 import { getEAStatus, getLastEACommand } from "../../../services/eaService";
 import { AlertTriangle,Power, X, Trash2, ArrowDownToLine, ArrowUpToLine } from "lucide-react";
 import { createEACommand } from "../../../services/eaService";
