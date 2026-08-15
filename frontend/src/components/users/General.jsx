@@ -2,7 +2,7 @@ import PageHeader from "../ui/PageHeader";
 import MarketTicker from "../dashboard/MarketTicker";
 import DashboardFooter from "../dashboard/DashboardFooter";
 import { useAuth } from "../../context/AuthContext";
-import SidebarRight from "../dashboard/SidebarRight";
+import DashboardSidebar from "../sidebarRight/DashboardSidebar";
 
 export default function General() {
     const { user } = useAuth();
@@ -22,7 +22,7 @@ export default function General() {
                 </main>
 
                 {/* Right Sidebar */}
-               <SidebarRight/>
+               <DashboardSidebar/>
             </div>
 
             <DashboardFooter />

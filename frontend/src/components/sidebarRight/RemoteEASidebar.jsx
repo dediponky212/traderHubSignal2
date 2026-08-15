@@ -1,4 +1,4 @@
-export default function SidebarRight() {
+export default function RemoteEASidebar() {
     return (
         <aside className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
