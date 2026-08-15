@@ -1,5 +1,6 @@
 import { useSidebar } from "../../context/SidebarContext";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { LayoutDashboard,
     BrainCircuit,
     CandlestickChart,
@@ -10,15 +11,16 @@ import { LayoutDashboard,
     LogOut,
     ChevronRight,
     TrendingUp,
+    ChevronDown,
 } from "lucide-react";
 import { navigation } from "../../config/navigation";
 import useMediaQuery from "../../hooks/useMediaQuery";
-
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import SidebarDropdown from "./SidebarDropdown";
 
 export default function Sidebar() {
     const isDesktop = useMediaQuery("(min-width: 1024px)");
+    const [settingsOpen, setSettingsOpen] = useState(false);
     const {
     isOpen,
     closeSidebar,
@@ -88,10 +90,15 @@ export default function Sidebar() {
                     {navigation.map((menu) => {
                         const Icon = menu.icon;
 
+                        if (menu.children) {
+                            return (
+                                <SidebarDropdown key={menu.title} item={menu} collapsed={collapsed} />
+                            );
+                        }
+
                         return (
                             <NavLink
-                                key={menu.title}
-                                to={menu.path}
+                                key={menu.title} to={menu.path}
                                 onClick={closeSidebar}
                                 className={({ isActive }) =>
                                     `group relative flex w-full items-center ${

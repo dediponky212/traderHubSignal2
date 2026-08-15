@@ -10,6 +10,8 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import AiRobot from "./components/users/aiRobots/AiRobot";
 import Profile from "./components/users/profile/Profile";
+import RemoteEA from "./components/users/remoteEa/RemoteEA";
+import General from "./components/users/General";
 
 function App() {
     return (
@@ -30,6 +32,8 @@ function App() {
                         </ProtectedRoute>
                     }>
                     <Route path="/dashboard" element={<DashboardPage />} />
+                    <Route path="/settings/remote-ea" element={<RemoteEA />} />
+                    <Route path="/settings/general" element={<General />} />
                     <Route path="/robots" element={<AiRobot/>} />
                     <Route path="/profile" element={<Profile/>} />
                 </Route>

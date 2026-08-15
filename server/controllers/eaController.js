@@ -32,7 +32,7 @@ exports.connect = (req, res) => {
             ON mt_accounts.user_id = ea_settings.user_id
         WHERE mt_accounts.account_number = ?`,
         [account_number],
-        (err, account) => {
+        async (err, account) => {
             if (err) {
                 return res.status(500).json({
                     success: false,
@@ -83,6 +83,7 @@ exports.connect = (req, res) => {
                 WHERE id=?`,
                 
             );
+            const role = await getEARole(account.id, account.user_id);
            return res.json({
                 success: true,
                 connected: true,
@@ -144,6 +145,8 @@ exports.heartbeat = (req, res) => {
             // ACCOUNT NOT FOUND
             // =========================
             if (!account) {
+             //   const role = await getEARole(account.id, account.user_id);
+             //   const activated = account.ea_enabled === 1;
                 return res.status(404).json({
                     success: false,
                     connected: false,
@@ -196,11 +199,7 @@ exports.heartbeat = (req, res) => {
             // SEMUA ROLE BOLEH
             // =========================
             db.all(
-                `
-                SELECT
-                    id,
-                    command,
-                    payload
+                `SELECT id, command,payload
                 FROM ea_commands
                 WHERE account_id = ?
                   AND status = 'pending'
@@ -208,10 +207,10 @@ exports.heartbeat = (req, res) => {
                 LIMIT 1
                 `,
                 [account.id],
-
-                (commandErr, commands) => {
+                async (commandErr, commands) => {
 
                     if (commandErr) {
+                       // const role = await getEARole(account.id, account.user_id);
                         return res.status(500).json({
                             success: false,
                             connected: true,
@@ -394,4 +393,136 @@ exports.signalAck = (req, res) => {
             });
         }
     );
+};
+
+function getEARole(accountId, userId) {
+    return new Promise((resolve, reject) => {
+        db.get(`
+            SELECT
+                (SELECT COUNT(*) FROM user_followers WHERE master_account_id = ?) AS follower_count,
+                (SELECT COUNT(*) FROM user_followers WHERE follower_user_id = ? AND status = 'active') AS following_count
+        `, [accountId, userId], (err, row) => {
+            if (err) return reject(err);
+
+            if (row.follower_count > 0) return resolve("MASTER");
+            if (row.following_count > 0) return resolve("FOLLOWER");
+
+            resolve("MEMBER");
+        });
+    });
+}
+
+function isHeartbeatFresh(lastPing, maxAgeSeconds = 30) {
+    if (!lastPing) return false;
+
+    const lastPingDate = new Date(lastPing).getTime();
+    if (Number.isNaN(lastPingDate)) return false;
+
+    const maxAgeMs = maxAgeSeconds * 1000;
+    return Date.now() - lastPingDate <= maxAgeMs;
+}
+
+exports.createCommand = (req, res) => {
+    const { account_id, command, payload = null } = req.body;
+
+    const allowed = ["CLOSE_ALL", "CLOSE_BUY", "CLOSE_SELL", "DELETE_PENDING", "MODIFY_SL", "MODIFY_TP"];
+
+    if (!account_id || !allowed.includes(command)) {
+        return res.status(400).json({ success: false, message: "Invalid command." });
+    }
+
+    db.get(`SELECT id, user_id, connected FROM mt_accounts WHERE id = ?`, [account_id], (err, account) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        if (!account) return res.status(404).json({ success: false, message: "Account not found." });
+
+        db.run(`
+            INSERT INTO ea_commands (user_id, account_id, command, payload, status)
+            VALUES (?, ?, ?, ?, 'pending')
+        `, [account.user_id, account.id, command, payload], function (err) {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+
+            res.json({
+                success: true,
+                command_id: this.lastID,
+                status: "pending"
+            });
+        });
+    });
+};
+
+exports.status = (req, res) => {
+    const userId = req.user.id;
+
+    db.get(`
+        SELECT id, account_number, account_name, server_name, connected, last_ping
+        FROM mt_accounts
+        WHERE user_id = ?
+        ORDER BY id DESC
+        LIMIT 1
+    `, [userId], (err, account) => {
+        if (err) {
+            console.error("EA STATUS ERROR:", err);
+            return res.status(500).json({ success: false, message: err.message });
+        }
+
+        if (!account) return res.json({ success: true, connected: false, activated: false, account: null, role: "MEMBER", heartbeat: 5, command: null });
+
+        const isConnected = account.connected === 1 && isHeartbeatFresh(account.last_ping, 30);
+
+        if (account.connected === 1 && !isConnected) {
+            db.run(
+                `UPDATE mt_accounts SET connected = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+                [account.id]
+            );
+        }
+
+        db.get(`
+            SELECT mt_accounts.ea_role, ea_settings.ea_enabled
+            FROM mt_accounts
+            LEFT JOIN ea_settings ON mt_accounts.user_id = ea_settings.user_id
+            WHERE mt_accounts.id = ?
+        `, [account.id], (roleErr, data) => {
+            if (roleErr) return res.status(500).json({ success: false, message: roleErr.message });
+
+            db.get(`
+                SELECT id, command, status, created_at, sent_at
+                FROM ea_commands
+                WHERE account_id = ? AND status IN ('pending', 'sent')
+                ORDER BY id DESC
+                LIMIT 1
+            `, [account.id], (commandErr, command) => {
+                if (commandErr) return res.status(500).json({ success: false, message: commandErr.message });
+
+                res.json({
+                    success: true,
+                    connected: isConnected,
+                    activated: data?.ea_enabled === 1 && isConnected,
+                    account: {
+                        ...account,
+                        connected: isConnected ? 1 : 0,
+                        last_ping: account.last_ping,
+                    },
+                    role: data?.ea_role || "MEMBER",
+                    heartbeat: 5,
+                    command: command || null,
+                });
+            });
+        });
+    });
+};
+
+exports.getLastCommand = (req, res) => {
+    const userId = req.user.id;
+
+    db.get(`
+        SELECT ec.id, ec.command, ec.payload, ec.status, ec.created_at, ec.sent_at, ec.executed_at
+        FROM ea_commands ec
+        JOIN mt_accounts ma ON ma.id = ec.account_id
+        WHERE ma.user_id = ?
+        ORDER BY ec.id DESC
+        LIMIT 1
+    `, [userId], (err, command) => {
+        if (err) return res.status(500).json({ success: false, message: err.message });
+        res.json({ success: true, command: command || null });
+    });
 };

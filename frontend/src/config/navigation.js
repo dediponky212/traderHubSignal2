@@ -10,6 +10,9 @@ import {
     Inbox,
     MessageCircle,
     UsersIcon,
+    SlidersHorizontal,
+    Copy,
+    Radio,
 } from "lucide-react";
 
 export const navigation = [
@@ -57,5 +60,32 @@ export const navigation = [
         title: "Settings",
         icon: Settings,
         path: "/settings",
+        children: [
+            {
+                label: "General",
+                path: "/settings/general",
+                icon: SlidersHorizontal,
+            },
+            {
+                label: "Remote EA",
+                path: "/settings/remote-ea",
+                icon: SlidersHorizontal,
+            },
+            {
+                label: "Copy Trading",
+                path: "/settings/copy-trading",
+                icon: Copy,
+            },
+            {
+                label: "Signal",
+                path: "/settings/signal",
+                icon: Radio,
+            },
+            {
+                label: "Notifications",
+                path: "/settings/notifications",
+                icon: Bell,
+            },
+        ],
     },
 ];

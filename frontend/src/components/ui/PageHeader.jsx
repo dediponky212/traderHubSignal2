@@ -4,16 +4,16 @@ export default function PageHeader({
     actions,
 }) {
     return (
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="mb-3 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
             <div>
 
-                <h1 className="text-3xl font-bold text-slate-900">
+                <h1 className="text-xl font-bold text-slate-900">
                     {title}
                 </h1>
 
                 {subtitle && (
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-1 text-slate-500">
                         {subtitle}
                     </p>
                 )}

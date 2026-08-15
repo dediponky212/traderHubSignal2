@@ -241,6 +241,19 @@ db.run(`
     );
 `);
 
+// Table user_followers
+db.run(`
+    CREATE TABLE IF NOT EXISTS user_followers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        master_account_id INTEGER NOT NULL,
+        follower_user_id INTEGER NOT NULL,
+        status TEXT DEFAULT 'active',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(master_account_id) REFERENCES mt_accounts(id),
+        FOREIGN KEY(follower_user_id) REFERENCES users(id)
+    );
+`);
+
 });
 
 
