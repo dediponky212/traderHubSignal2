@@ -1,5 +1,4 @@
 import { Link, NavLink } from "react-router-dom";
-import { TrendingUp } from "lucide-react";
 
 export default function Navbar() {
     return (
@@ -21,18 +20,7 @@ export default function Navbar() {
 
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-3">
-                    <div className="
-                                flex
-                                h-10
-                                w-10
-                                items-center
-                                justify-center
-                                rounded-xl
-                                bg-blue-600
-                                text-white
-                                shadow-md">
-                        <TrendingUp size={20} />
-                    </div>
+                    <img src="/img/logo.png" alt="TraderHub" className="h-10 w-10 rounded-xl shadow-md" />
 
                     <div>
                         <h1 className="text-lg font-bold tracking-tight text-slate-800">

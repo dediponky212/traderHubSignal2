@@ -10,7 +10,6 @@ import { LayoutDashboard,
     Settings,
     LogOut,
     ChevronRight,
-    TrendingUp,
     ChevronDown,
 } from "lucide-react";
 import { navigation } from "../../config/navigation";
@@ -62,9 +61,7 @@ export default function Sidebar() {
                 }`}
             >
                 <div className="flex items-center">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-                        <TrendingUp size={20} />
-                    </div>
+                    <img src="/img/logo.png" alt="TraderHub" className="h-10 w-10 rounded-xl shadow-md" />
 
                     {!collapsed && (
                         <div className="ml-3">
