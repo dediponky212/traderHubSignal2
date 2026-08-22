@@ -7,9 +7,6 @@ import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
     const {user} = useAuth();
-        if(user) {
-            return <Navigate to="/dashboard" replace/>;
-        }
     const navigate = useNavigate();
     const [form, setForm] = useState({
         fullname: "",
@@ -21,9 +18,19 @@ export default function RegisterPage() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    
+
     // State baru untuk mengontrol kemunculan popup sukses
-    const [showSuccessPopup, setShowSuccessPopup] = useState(false); 
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
+    // Hooks above must always run in the same order every render - the
+    // early return has to come after all of them (matches LoginPage.jsx),
+    // otherwise React throws "Rendered fewer hooks than expected" the
+    // moment `user` flips from null to an object (e.g. an already-logged-in
+    // visitor landing on /register while AuthContext's initial /me call
+    // resolves) and this page just crashes.
+    if (user) {
+        return <Navigate to="/dashboard" replace/>;
+    }
 
     const handleChange = (e) => {
         setForm({
@@ -115,7 +122,7 @@ export default function RegisterPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
+                        className="w-full cursor-pointer rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
                         {loading ? "Creating..." : "Create Account"}
                     </button>
                 </form>
