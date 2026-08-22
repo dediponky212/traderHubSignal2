@@ -30,6 +30,12 @@ export default function Button({
 
         ghost:
             "bg-transparent text-slate-700 hover:bg-slate-100",
+
+        violet:
+            "bg-violet-600 text-white hover:bg-violet-700",
+
+        dark:
+            "bg-slate-700 text-white hover:bg-slate-800",
     };
 
     const sizes = {
