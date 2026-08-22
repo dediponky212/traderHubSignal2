@@ -9,10 +9,8 @@ const isDesktop = useMediaQuery("(min-width: 1024px)");
     const {
         isOpen,
         closeSidebar,
-        toggleSidebar,
-        collapsed,
         sidebarWidth,
-        toggleCollapse, } = useSidebar();
+    } = useSidebar();
     return (
         <div className="h-screen overflow-hidden bg-slate-100">
             {isOpen && (

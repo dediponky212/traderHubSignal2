@@ -87,7 +87,7 @@ export default function RegisterPage() {
                             </svg>
                         </div>
                         <h3 className="mb-2 text-2xl font-bold text-slate-800">Registration Success!</h3>
-                        <p className="mb-6 text-slate-500">Welcome to ForexHub, {form.fullname}. We are redirecting you to the login page...</p>
+                        <p className="mb-6 text-slate-500">Welcome to TraderHub, {form.fullname}. We are redirecting you to the login page...</p>
                         <div className="mx-auto h-1 w-24 overflow-hidden rounded-full bg-slate-100">
                             <div className="h-full animate-pulse bg-green-500"></div>
                         </div>
@@ -101,7 +101,7 @@ export default function RegisterPage() {
                     <img src="/img/logo.png" alt="TraderHub" className="h-12 w-12 rounded-xl shadow-md" />
                     <div className="text-center">
                         <h1 className="text-3xl font-bold">Create Account</h1>
-                        <p className="mt-2 text-slate-500">Join ForexHub today.</p>
+                        <p className="mt-2 text-slate-500">Join TraderHub today.</p>
                     </div>
                 </div>
 

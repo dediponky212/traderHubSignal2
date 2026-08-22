@@ -7,7 +7,6 @@ import {
     Bell,
     Settings,
     Calendar,
-    Inbox,
     MessageCircle,
     UsersIcon,
     SlidersHorizontal,

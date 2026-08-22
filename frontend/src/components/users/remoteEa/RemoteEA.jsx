@@ -508,7 +508,7 @@ export default function RemoteEA() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-base font-semibold text-slate-800">EA Status</h2>
-                                <p className="text-xs text-slate-500">ForexHub Expert Advisor</p>
+                                <p className="text-xs text-slate-500">TraderHub Expert Advisor</p>
                             </div>
 
                             <div className="flex items-center gap-2">

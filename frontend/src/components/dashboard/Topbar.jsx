@@ -20,8 +20,6 @@ export default function Topbar() {
     
 const isDesktop = useMediaQuery("(min-width: 1024px)");
     const {toggleSidebar,
-        isOpen,
-        closeSidebar,
         collapsed,
         toggleCollapse,
         sidebarWidth,

@@ -1,10 +1,6 @@
-import Button from "../ui/Button";
-
 import {
     Bot,
     Star,
-    TrendingUp,
-    Shield,
     Users,
 } from "lucide-react";
 

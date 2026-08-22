@@ -158,7 +158,7 @@ export default function AIInsightPanel() {
                         >
                         <div className="text-6xl"> 🧠 </div>
                         <h3 className="mt-4 text-2xl font-bold text-slate-800">
-                            ForexHub AI Engine
+                            TraderHub AI Engine
                         </h3>
                         <p className="mx-auto mt-3 max-w-2xl text-slate-600 leading-7">
                             Our Artificial Intelligence analyzes market structure,

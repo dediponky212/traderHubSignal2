@@ -1,4 +1,3 @@
-import { ChevronRight } from "lucide-react";
 import { economicEvents } from "../../data/economicEvents";
 
 export default function EconomicCalendar() {

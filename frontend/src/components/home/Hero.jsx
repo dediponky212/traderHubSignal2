@@ -1,8 +1,7 @@
-import Section from "../ui/Section";
 import Container from "../ui/Container";
 import Button from "../ui/Button";
 import Badge from "../ui/Badge";
-import { ArrowRight, Play, Brain, TrendingUp, Users } from "lucide-react";
+import { Brain, TrendingUp, Users } from "lucide-react";
 
 export default function Hero() {
     return (
@@ -31,7 +30,7 @@ export default function Hero() {
                     </h1>
 
                     <p className="mt-8 max-w-xl text-lg leading-8 text-slate-600">
-                        Forex Hub membantu trader menganalisa market menggunakan AI,
+                        TraderHub membantu trader menganalisa market menggunakan AI,
                         membangun robot trading, melakukan copy trading,
                         mengelola portfolio,
                         dan mengirim signal secara otomatis

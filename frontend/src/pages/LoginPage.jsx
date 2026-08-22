@@ -39,7 +39,7 @@ export default function LoginPage() {
                     <img src="/img/logo.png" alt="TraderHub" className="h-12 w-12 rounded-xl shadow-md" />
                     <div className="text-center">
                         <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
-                        <p className="mt-3 text-slate-500">Login ke akun Forex Hub Anda.</p>
+                        <p className="mt-3 text-slate-500">Login ke akun TraderHub Anda.</p>
                     </div>
                 </div>
 

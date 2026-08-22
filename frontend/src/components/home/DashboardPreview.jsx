@@ -1,6 +1,5 @@
 import Section from "../ui/Section";
 import SectionTitle from "../ui/SectionTitle";
-import Card from "../ui/Card";
 import StatCard from "../ui/StartCard";
 import {Brain,TrendingUp,Users,Activity,ArrowUpRight,
 } from "lucide-react";

@@ -50,7 +50,7 @@ export default function Features() {
             <div className="mb-16">
                 <SectionTitle
                     title="Everything You Need to Trade Smarter"
-                    subtitle="Forex Hub menggabungkan AI, otomatisasi, analitik, dan copy trading ke dalam satu platform modern."
+                    subtitle="TraderHub menggabungkan AI, otomatisasi, analitik, dan copy trading ke dalam satu platform modern."
                 />
             </div>
                 <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">

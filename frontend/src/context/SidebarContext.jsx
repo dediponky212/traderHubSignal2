@@ -8,7 +8,6 @@ export function SidebarProvider({ children }) {
     const closeSidebar = () => setIsOpen(false);
     const toggleSidebar = () => setIsOpen((prev) => !prev);
     const [collapsed, setCollapsed] = useState(false);
-    const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
     const sidebarWidth = collapsed ? 80 : 288;
 
     const toggleCollapse = () => {

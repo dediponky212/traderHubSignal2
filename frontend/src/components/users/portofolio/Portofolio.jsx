@@ -4,6 +4,7 @@ import { Wallet, TrendingUp, DollarSign, BarChart3, Eye, EyeOff, Radio } from "l
 import axios from "axios";
 import MonthlyPerformanceChart from "../../charts/MonthlyPerformanceChart";
 import PortfolioPerformanceChart from "../../charts/PortfolioPerformanceChart";
+import { formatNumber, formatDateTime } from "../../../utils/format";
 
 import PageHeader from "../../ui/PageHeader";
 import Card from "../../ui/Card";
@@ -107,7 +108,6 @@ export default function Portfolio() {
     }, []);
 
     const summary = portfolio?.summary || {};
-    const trades = portfolio?.recentTrades || [];
     const performance = portfolio?.performance || [];
     const monthly = portfolio?.monthly || [];
 
@@ -382,38 +382,3 @@ function drawdownBg(value) {
     return Number(value) <= 5 ? "text-emerald-600 bg-emerald-50" : Number(value) <= 15 ? "text-amber-600 bg-amber-50" : "text-red-600 bg-red-50";
 }
 
-function PerformanceChart({ data, loading }) {
-    if (loading) return <div className="h-64 animate-pulse rounded-2xl bg-slate-50" />;
-    if (!data.length) return <div className="flex h-64 items-center justify-center rounded-2xl bg-slate-50 text-sm text-slate-400">No performance data.</div>;
-
-    const values = data.map((item) => Number(item.value) || 0);
-    const max = Math.max(...values, 1);
-    const min = Math.min(...values, 0);
-    const range = max - min || 1;
-    const points = values.map((value, index) => `${(index / Math.max(values.length - 1, 1)) * 100},${100 - ((value - min) / range) * 100}`).join(" ");
-
-    return (
-        <div className="h-64 rounded-2xl bg-slate-50 p-4">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-                <polyline points={points} fill="none" stroke="currentColor" strokeWidth="1.5" className="text-blue-600" vectorEffect="non-scaling-stroke" />
-            </svg>
-        </div>
-    );
-}
-
-function formatNumber(value) {
-    if (value === null || value === undefined || value === "") return "-";
-    return Number(value).toLocaleString("en-US", { maximumFractionDigits: 2 });
-}
-
-function formatDateTime(value) {
-    if (!value) return "-";
-    return new Date(value.replace(" ", "T")).toLocaleString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-    });
-}
