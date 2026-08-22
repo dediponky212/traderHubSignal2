@@ -12,6 +12,7 @@ import {
     SlidersHorizontal,
     Copy,
     Radio,
+    Trophy,
 } from "lucide-react";
 
 export const navigation = [
@@ -39,6 +40,11 @@ export const navigation = [
         title: "Portfolio",
         icon: BarChart3,
         path: "/portfolio",
+    },
+    {
+        title: "Ranking",
+        icon: Trophy,
+        path: "/ranking",
     },
     {
         title: "Calendar",

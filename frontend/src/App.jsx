@@ -13,6 +13,7 @@ import Profile from "./components/users/profile/Profile";
 import RemoteEA from "./components/users/remoteEa/RemoteEA";
 import General from "./components/users/General";
 import Portfolio from "./components/users/portofolio/Portofolio";
+import Ranking from "./pages/Ranking";
 import ComingSoon from "./pages/ComingSoon";
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
                     <Route path="/settings/general" element={<General />} />
                     <Route path="/robots" element={<AiRobot/>} />
                     <Route path="/profile" element={<Profile/>} />
+                    <Route path="/ranking" element={<Ranking />} />
 
                     {/* Linked from the sidebar (config/navigation.js) but not
                         built yet - explicit routes so ComingSoon can show a
