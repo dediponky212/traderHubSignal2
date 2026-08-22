@@ -51,6 +51,7 @@ export default function LoginPage() {
 
                     <button type="submit" disabled={loading} className="
                             w-full
+                            cursor-pointer
                             rounded-xl
                             bg-blue-600
                             py-3
@@ -58,6 +59,7 @@ export default function LoginPage() {
                             text-white
                             transition
                             hover:bg-blue-700
+                            disabled:cursor-not-allowed
                             disabled:opacity-50
                         ">
                         {loading ? "Logging in..." : "Login"}

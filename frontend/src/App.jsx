@@ -12,6 +12,7 @@ import AiRobot from "./components/users/aiRobots/AiRobot";
 import Profile from "./components/users/profile/Profile";
 import RemoteEA from "./components/users/remoteEa/RemoteEA";
 import General from "./components/users/General";
+import Portfolio from "./components/users/portofolio/Portofolio";
 
 function App() {
     return (
@@ -33,6 +34,7 @@ function App() {
                     }>
                     <Route path="/dashboard" element={<DashboardPage />} />
                     <Route path="/settings/remote-ea" element={<RemoteEA />} />
+                    <Route path="/portfolio" element={<Portfolio />} />
                     <Route path="/settings/general" element={<General />} />
                     <Route path="/robots" element={<AiRobot/>} />
                     <Route path="/profile" element={<Profile/>} />

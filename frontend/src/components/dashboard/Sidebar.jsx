@@ -66,7 +66,7 @@ export default function Sidebar() {
                     {!collapsed && (
                         <div className="ml-3">
                             <h1 className="font-bold text-slate-900">
-                                Forex Hub
+                                TraderHub
                             </h1>
 
                             <p className="text-xs text-slate-500">

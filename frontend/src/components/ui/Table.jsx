@@ -2,15 +2,19 @@ export default function Table({
     columns = [],
     data = [],
     emptyText = "No data available",
+    maxHeight,
 }) {
     return (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
 
-            <div className="overflow-x-auto">
+            <div
+                className={`overflow-x-auto${maxHeight ? " overflow-y-auto" : ""}`}
+                style={maxHeight ? { maxHeight } : undefined}
+            >
 
                 <table className="min-w-full">
 
-                    <thead className="bg-slate-100">
+                    <thead className={`bg-slate-100${maxHeight ? " sticky top-0 z-10" : ""}`}>
 
                         <tr>
 

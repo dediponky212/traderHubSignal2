@@ -92,7 +92,7 @@ export default function RobotCarousel() {
                 </div>
 
                 <button
-                    className="font-semibold text-blue-600 hover:underline"
+                    className="cursor-pointer font-semibold text-blue-600 hover:underline"
                 >
                     View All
                 </button>

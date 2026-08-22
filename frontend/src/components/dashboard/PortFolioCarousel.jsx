@@ -85,7 +85,7 @@ export default function PortfolioCarousel() {
 
                 </div>
 
-                <button className="text-blue-600 font-semibold hover:underline">
+                <button className="cursor-pointer text-blue-600 font-semibold hover:underline">
                     View All
                 </button>
 

@@ -93,6 +93,7 @@ export default function PortfolioCard({ portfolio }) {
                 </div>
                 <button
                     className="
+                        cursor-pointer
                         rounded-lg
                         bg-emerald-600
                         px-3

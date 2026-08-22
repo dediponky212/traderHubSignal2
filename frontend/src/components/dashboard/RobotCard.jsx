@@ -98,6 +98,7 @@ export default function RobotCard({ robot }) {
             </div>
             <button
                     className="
+                        cursor-pointer
                         rounded-lg
                         bg-blue-600
                         px-3

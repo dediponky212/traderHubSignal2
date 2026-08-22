@@ -121,6 +121,7 @@ export default function AIInsightPanel() {
                             onClick={analyze}
                             disabled={loading}
                             className="
+                                cursor-pointer
                                 rounded-xl
                                 bg-violet-600
                                 px-6

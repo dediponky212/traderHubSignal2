@@ -15,3 +15,21 @@ html{
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
+/* Remote EA: pulsing glow on the "Connected" badge, alive look. */
+@keyframes fh-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.45); }
+    50% { box-shadow: 0 0 12px 3px rgba(16, 185, 129, 0.45); }
+}
+.fh-connected-glow {
+    animation: fh-glow 1.8s ease-in-out infinite;
+}
+
+/* Remote EA: brief flash on the Heartbeat tile each time a ping lands. */
+@keyframes fh-heartbeat-flash {
+    0% { background-color: rgba(59, 130, 246, 0.18); }
+    100% { background-color: transparent; }
+}
+.fh-heartbeat-flash {
+    animation: fh-heartbeat-flash 1s ease-out;
+}

@@ -11,7 +11,7 @@ export default function SidebarDropdown({ item, collapsed }) {
             <button
                 type="button"
                 onClick={() => !collapsed && setOpen(!open)}
-                className={`group relative flex w-full items-center rounded-xl px-3 py-3 transition ${
+                className={`group relative flex w-full cursor-pointer items-center rounded-xl px-3 py-3 transition ${
                     collapsed ? "justify-center" : "justify-between"
                 } text-slate-600 hover:bg-blue-50 hover:text-blue-600`}
             >
