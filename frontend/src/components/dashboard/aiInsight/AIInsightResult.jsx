@@ -1,6 +1,4 @@
 import {
-    ArrowUp,
-    ArrowDown,
     Shield,
     Target,
     CircleStop,

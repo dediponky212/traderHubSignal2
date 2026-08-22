@@ -42,6 +42,7 @@ export default function DashboardFooter() {
                     <button
                         className="
                             flex
+                            cursor-pointer
                             items-center
                             gap-2
                             transition
@@ -55,6 +56,7 @@ export default function DashboardFooter() {
                     <button
                         className="
                             flex
+                            cursor-pointer
                             items-center
                             gap-2
                             transition
@@ -68,6 +70,7 @@ export default function DashboardFooter() {
                     <button
                         className="
                             flex
+                            cursor-pointer
                             items-center
                             gap-2
                             transition
@@ -81,7 +84,7 @@ export default function DashboardFooter() {
                 </div>
 
                 <p className="text-center text-xs text-slate-400">
-                    © 2026 ForexHub. All rights reserved.
+                    © 2026 TraderHub. All rights reserved.
                 </p>
 
             </div>

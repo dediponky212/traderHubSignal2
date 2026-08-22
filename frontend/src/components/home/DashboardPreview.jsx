@@ -1,6 +1,5 @@
 import Section from "../ui/Section";
 import SectionTitle from "../ui/SectionTitle";
-import Card from "../ui/Card";
 import StatCard from "../ui/StartCard";
 import {Brain,TrendingUp,Users,Activity,ArrowUpRight,
 } from "lucide-react";
@@ -28,7 +27,7 @@ export default function DashboardPreview() {
                                 Live Trading Statistics
                             </p>
                         </div>
-                        <button className="rounded-xl bg-blue-600 px-5 py-2 text-white">
+                        <button className="cursor-pointer rounded-xl bg-blue-600 px-5 py-2 text-white">
                             Live
                         </button>
                     </div>

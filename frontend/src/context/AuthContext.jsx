@@ -43,6 +43,13 @@ export function AuthProvider({ children }) {
         setUser(null);
     };
 
+    // Lets pages that update the profile (PATCH /api/auth/profile) push the
+    // fresh user object straight into context, instead of the rest of the
+    // app showing stale name/avatar/etc. until the next full reload.
+    const updateUser = (updatedUser) => {
+        setUser((prev) => ({ ...prev, ...updatedUser }));
+    };
+
     return (
         <AuthContext.Provider
             value={{
@@ -50,6 +57,7 @@ export function AuthProvider({ children }) {
                 loading,
                 login,
                 logout,
+                updateUser,
             }}>
             {children}
         </AuthContext.Provider>

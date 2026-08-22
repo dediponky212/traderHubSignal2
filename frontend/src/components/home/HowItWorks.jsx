@@ -13,7 +13,7 @@ const steps = [
     {
         icon: PlugZap,
         title: "Connect Broker",
-        desc: "Hubungkan akun MetaTrader Anda dengan Forex Hub hanya sekali."
+        desc: "Hubungkan akun MetaTrader Anda dengan TraderHub hanya sekali."
     },
     {
         icon: RefreshCcw,
@@ -46,7 +46,7 @@ export default function HowItWorks() {
     return (
         <Section className="bg-slate-50">
             <SectionTitle
-                title="How Forex Hub Works"
+                title="How TraderHub Works"
                 subtitle="Dari akun trading Anda hingga AI dan komunitas,
                         semuanya berjalan otomatis dalam satu alur sederhana."
                 />

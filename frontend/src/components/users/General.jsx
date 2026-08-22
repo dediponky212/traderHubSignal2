@@ -1,12 +1,8 @@
-import PageHeader from "../ui/PageHeader";
 import MarketTicker from "../dashboard/MarketTicker";
 import DashboardFooter from "../dashboard/DashboardFooter";
-import { useAuth } from "../../context/AuthContext";
 import DashboardSidebar from "../sidebarRight/DashboardSidebar";
 
 export default function General() {
-    const { user } = useAuth();
-
     return (
         <div className="min-h-full">
             <MarketTicker />

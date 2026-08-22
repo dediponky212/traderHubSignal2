@@ -1,10 +1,6 @@
-import Button from "../ui/Button";
-
 import {
     Bot,
     Star,
-    TrendingUp,
-    Shield,
     Users,
 } from "lucide-react";
 
@@ -98,6 +94,7 @@ export default function RobotCard({ robot }) {
             </div>
             <button
                     className="
+                        cursor-pointer
                         rounded-lg
                         bg-blue-600
                         px-3

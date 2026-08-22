@@ -25,7 +25,7 @@ export default function Footer() {
 
                             <div>
                                 <h3 className="text-lg font-bold text-white">
-                                    Forex Hub
+                                    TraderHub
                                 </h3>
                                 <p className="text-sm text-slate-400">
                                     AI Trading Ecosystem
@@ -103,7 +103,7 @@ export default function Footer() {
                 <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-8 text-sm md:flex-row">
 
                     <p className="text-slate-500">
-                        © {year} Forex Hub. All rights reserved.
+                        © {year} TraderHub. All rights reserved.
                     </p>
 
                     <div className="flex gap-6 text-slate-500">

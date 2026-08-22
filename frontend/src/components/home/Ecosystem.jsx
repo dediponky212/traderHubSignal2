@@ -17,7 +17,7 @@ export default function Ecosystem() {
         <Section className="bg-white">
                 <SectionTitle
                     title="One Ecosystem Endless Possibilities."
-                     subtitle="Semua layanan Forex Hub saling terhubung untuk
+                     subtitle="Semua layanan TraderHub saling terhubung untuk
                         menciptakan pengalaman trading yang lebih cerdas,
                         cepat, dan otomatis."
                 />
@@ -37,7 +37,7 @@ export default function Ecosystem() {
                                 </h3>
                                 <p className="mt-4 text-slate-500 leading-7">
                                     Terintegrasi langsung dengan seluruh
-                                    layanan Forex Hub untuk memberikan
+                                    layanan TraderHub untuk memberikan
                                     pengalaman trading modern.
                                 </p>
                             </div>

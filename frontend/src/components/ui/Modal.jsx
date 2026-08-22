@@ -46,7 +46,7 @@ export default function Modal({
 
                     <button
                         onClick={onClose}
-                        className="rounded-lg p-2 hover:bg-slate-100"
+                        className="cursor-pointer rounded-lg p-2 hover:bg-slate-100"
                     >
                         <X size={20} />
                     </button>

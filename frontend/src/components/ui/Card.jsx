@@ -1,10 +1,7 @@
-export default function Card({
-    children,
-    className = "",
+export default function Card({ children, className = "",
 }) {
     return (
-        <div
-            className={`
+        <div className={`
                 rounded-3xl
                 border
                 border-slate-200
@@ -14,9 +11,7 @@ export default function Card({
                 duration-300
                 hover:-translate-y-1
                 hover:shadow-xl
-                ${className}
-            `}
-        >
+                ${className}`}>
             {children}
         </div>
     );

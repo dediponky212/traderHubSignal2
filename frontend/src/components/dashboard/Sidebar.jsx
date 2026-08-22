@@ -1,30 +1,15 @@
 import { useSidebar } from "../../context/SidebarContext";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { LayoutDashboard,
-    BrainCircuit,
-    CandlestickChart,
-    Users,
-    BarChart3,
-    Bell,
-    Settings,
-    LogOut,
-    ChevronRight,
-    ChevronDown,
-} from "lucide-react";
+import { LogOut, ChevronRight } from "lucide-react";
 import { navigation } from "../../config/navigation";
-import useMediaQuery from "../../hooks/useMediaQuery";
 import { useAuth } from "../../context/AuthContext";
 import SidebarDropdown from "./SidebarDropdown";
 
 export default function Sidebar() {
-    const isDesktop = useMediaQuery("(min-width: 1024px)");
-    const [settingsOpen, setSettingsOpen] = useState(false);
     const {
     isOpen,
     closeSidebar,
     collapsed,
-    toggleCollapse,
     sidebarWidth,
 } = useSidebar();
     const { user, logout } = useAuth();
@@ -66,7 +51,7 @@ export default function Sidebar() {
                     {!collapsed && (
                         <div className="ml-3">
                             <h1 className="font-bold text-slate-900">
-                                Forex Hub
+                                TraderHub
                             </h1>
 
                             <p className="text-xs text-slate-500">
