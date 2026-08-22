@@ -13,6 +13,7 @@ import Profile from "./components/users/profile/Profile";
 import RemoteEA from "./components/users/remoteEa/RemoteEA";
 import General from "./components/users/General";
 import Portfolio from "./components/users/portofolio/Portofolio";
+import ComingSoon from "./pages/ComingSoon";
 
 function App() {
     return (
@@ -38,6 +39,20 @@ function App() {
                     <Route path="/settings/general" element={<General />} />
                     <Route path="/robots" element={<AiRobot/>} />
                     <Route path="/profile" element={<Profile/>} />
+
+                    {/* Linked from the sidebar (config/navigation.js) but not
+                        built yet - explicit routes so ComingSoon can show a
+                        proper title via getNavLabel(), plus a wildcard below
+                        so any other/future dead link never renders blank. */}
+                    <Route path="/signals" element={<ComingSoon />} />
+                    <Route path="/copy-trading" element={<ComingSoon />} />
+                    <Route path="/calendar" element={<ComingSoon />} />
+                    <Route path="/notifications" element={<ComingSoon />} />
+                    <Route path="/community" element={<ComingSoon />} />
+                    <Route path="/settings/copy-trading" element={<ComingSoon />} />
+                    <Route path="/settings/signal" element={<ComingSoon />} />
+                    <Route path="/settings/notifications" element={<ComingSoon />} />
+                    <Route path="*" element={<ComingSoon />} />
                 </Route>
 
             </Routes>

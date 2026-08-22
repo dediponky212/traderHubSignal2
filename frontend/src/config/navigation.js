@@ -88,3 +88,18 @@ export const navigation = [
         ],
     },
 ];
+
+// Looks up the human-readable title/label for a route path from the nav
+// structure above (used by ComingSoon.jsx so a placeholder page always has
+// a sensible heading instead of a raw path). Falls back to null if the path
+// isn't in the nav at all (e.g. a typo'd URL).
+export function getNavLabel(pathname) {
+    for (const item of navigation) {
+        if (item.path === pathname) return item.title;
+        if (item.children) {
+            const child = item.children.find((c) => c.path === pathname);
+            if (child) return child.label;
+        }
+    }
+    return null;
+}
