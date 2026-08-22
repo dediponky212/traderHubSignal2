@@ -81,7 +81,7 @@ exports.connect = (req, res) => {
                     last_ping=CURRENT_TIMESTAMP,
                     updated_at=CURRENT_TIMESTAMP
                 WHERE id=?`,
-                
+                [account.id]
             );
             const role = await getEARole(account.id, account.user_id);
            return res.json({
@@ -102,11 +102,21 @@ exports.heartbeat = (req, res) => {
 
     const {
         account_number,
+        account_token,
         balance,
         equity,
         margin,
         free_margin,
-        margin_level
+        margin_level,
+        broker,
+        terminal_build,
+        platform,
+        symbol,
+        point,
+        digits,
+        bid,
+        ask,
+        positions
     } = req.body;
 
     db.get(
@@ -119,7 +129,7 @@ exports.heartbeat = (req, res) => {
             ea_settings.copy_trading,
             ea_settings.subscription_expired
         FROM mt_accounts
-        JOIN ea_settings
+        LEFT JOIN ea_settings
             ON mt_accounts.user_id = ea_settings.user_id
         WHERE mt_accounts.account_number = ?
         `,
@@ -158,6 +168,20 @@ exports.heartbeat = (req, res) => {
             }
 
             // =========================
+            // AUTH: account_token must match this account
+            // =========================
+            if (!tokenMatches(account, account_token)) {
+                return res.status(401).json({
+                    success: false,
+                    connected: false,
+                    activated: false,
+                    commands: [],
+                    signals: [],
+                    message: "Invalid account token."
+                });
+            }
+
+            // =========================
             // UPDATE ACCOUNT STATUS
             // =========================
             db.run(
@@ -169,6 +193,14 @@ exports.heartbeat = (req, res) => {
                     margin = ?,
                     free_margin = ?,
                     margin_level = ?,
+                    broker = ?,
+                    terminal_build = ?,
+                    platform = ?,
+                    symbol = ?,
+                    point = ?,
+                    digits = ?,
+                    bid = ?,
+                    ask = ?,
                     connected = 1,
                     last_ping = CURRENT_TIMESTAMP,
                     updated_at = CURRENT_TIMESTAMP
@@ -180,9 +212,27 @@ exports.heartbeat = (req, res) => {
                     margin,
                     free_margin,
                     margin_level,
+                    broker,
+                    terminal_build,
+                    platform,
+                    symbol,
+                    point,
+                    digits,
+                    bid,
+                    ask,
                     account_number
                 ]
             );
+
+            // =========================
+            // RECONCILE OPEN POSITIONS
+            // (best-effort, doesn't block the heartbeat response)
+            // =========================
+            if (Array.isArray(positions)) {
+                tradeService
+                    .syncPositions(account.user_id, account.id, positions)
+                    .catch((syncErr) => console.error("Position sync error:", syncErr.message));
+            }
 
             // =========================
             // ROLE
@@ -306,6 +356,34 @@ exports.heartbeat = (req, res) => {
     );
 };
 
+// Matches the EA's Disconnect() call (sent on EA/terminal shutdown, e.g.
+// OnDeinit). Without this route the EA's graceful-shutdown ping had nowhere
+// to land - it 404'd silently and "connected" only cleared once the next
+// GET /status request noticed last_ping was stale (up to 30s later).
+exports.disconnect = (req, res) => {
+    const { account_number, account_token } = req.body;
+
+    db.get(
+        `SELECT id, account_token FROM mt_accounts WHERE account_number = ?`,
+        [account_number],
+        (err, account) => {
+            if (err) return res.status(500).json({ success: false, message: err.message });
+            if (!tokenMatches(account, account_token)) {
+                return res.status(401).json({ success: false, message: "Invalid account token." });
+            }
+
+            db.run(
+                `UPDATE mt_accounts SET connected = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+                [account.id],
+                (updateErr) => {
+                    if (updateErr) return res.status(500).json({ success: false, message: updateErr.message });
+                    res.json({ success: true, message: "Disconnected." });
+                }
+            );
+        }
+    );
+};
+
 exports.trade = async (req, res) => {
     try {
         const result = await tradeService.saveTrade(req.body);
@@ -320,35 +398,54 @@ exports.trade = async (req, res) => {
 
 exports.commandAck = (req, res) => {
     const {
+        account_token,
         command_id,
         success,
         message
     } = req.body;
-    const status = success ? "executed" : "failed";
-    console.log("COMMAND ACK:", {
-        command_id,
-        success,
-        message
-    });
-    db.run(`
-        UPDATE ea_commands
-        SET
-            status = ?,
-            executed_at = CURRENT_TIMESTAMP
-        WHERE id = ?`,
-        [status, command_id],
-        function (err) {
-            if (err) {
-                console.error("COMMAND ACK ERROR:", err);
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
+
+    // command_id already scopes this to exactly one account (via the JOIN
+    // below), and tokenMatches proves the caller actually holds that
+    // account's token - that's sufficient. (Also comparing account_number
+    // from the body against the DB's copy is redundant and was actually a
+    // bug: sqlite returns account_number as a JS number while the EA sends
+    // it as a JSON string, so a strict `!==` compare always "failed".)
+    db.get(
+        `SELECT ma.account_token
+         FROM ea_commands ec
+         JOIN mt_accounts ma ON ma.id = ec.account_id
+         WHERE ec.id = ?`,
+        [command_id],
+        (lookupErr, owner) => {
+            if (lookupErr) {
+                return res.status(500).json({ success: false, message: lookupErr.message });
             }
-            return res.json({
-                success: true,
-                message: "Command ACK saved."
-            });
+            if (!tokenMatches(owner, account_token)) {
+                return res.status(401).json({ success: false, message: "Invalid account token." });
+            }
+
+            const status = success ? "executed" : "failed";
+            db.run(`
+                UPDATE ea_commands
+                SET
+                    status = ?,
+                    executed_at = CURRENT_TIMESTAMP
+                WHERE id = ?`,
+                [status, command_id],
+                function (err) {
+                    if (err) {
+                        console.error("COMMAND ACK ERROR:", err);
+                        return res.status(500).json({
+                            success: false,
+                            message: err.message
+                        });
+                    }
+                    return res.json({
+                        success: true,
+                        message: "Command ACK saved."
+                    });
+                }
+            );
         }
     );
 };
@@ -356,41 +453,60 @@ exports.commandAck = (req, res) => {
 exports.signalAck = (req, res) => {
 
     const {
+        account_token,
         signal_id,
         success
     } = req.body;
 
-    if (!success) {
-        return res.json({
-            success: true,
-            message: "Signal rejected by EA."
-        });
-    }
-
-    db.run(
-        `
-        UPDATE signal_deliveries
-        SET
-            status = 'executed',
-            received_at = CURRENT_TIMESTAMP,
-            executed_at = CURRENT_TIMESTAMP
-        WHERE id = ?
-          AND status = 'pending'
-        `,
+    // Same reasoning as commandAck: signal_id already scopes this to one
+    // account, tokenMatches proves ownership - no need to also cross-check
+    // account_number (which, being a number-vs-string comparison, was buggy).
+    db.get(
+        `SELECT ma.account_token
+         FROM signal_deliveries sd
+         JOIN mt_accounts ma ON ma.id = sd.follower_account_id
+         WHERE sd.id = ?`,
         [signal_id],
-        function(err) {
+        (lookupErr, owner) => {
+            if (lookupErr) {
+                return res.status(500).json({ success: false, message: lookupErr.message });
+            }
+            if (!tokenMatches(owner, account_token)) {
+                return res.status(401).json({ success: false, message: "Invalid account token." });
+            }
 
-            if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
+            if (!success) {
+                return res.json({
+                    success: true,
+                    message: "Signal rejected by EA."
                 });
             }
 
-            return res.json({
-                success: true,
-                message: "Signal marked executed."
-            });
+            db.run(
+                `
+                UPDATE signal_deliveries
+                SET
+                    status = 'executed',
+                    received_at = CURRENT_TIMESTAMP,
+                    executed_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                  AND status = 'pending'
+                `,
+                [signal_id],
+                function(err) {
+                    if (err) {
+                        return res.status(500).json({
+                            success: false,
+                            message: err.message
+                        });
+                    }
+
+                    return res.json({
+                        success: true,
+                        message: "Signal marked executed."
+                    });
+                }
+            );
         }
     );
 };
@@ -412,10 +528,28 @@ function getEARole(accountId, userId) {
     });
 }
 
+// SQLite's CURRENT_TIMESTAMP returns "YYYY-MM-DD HH:MM:SS" in UTC but WITHOUT
+// timezone info. `new Date()` parses that space-separated form as LOCAL time,
+// so on a server not running in UTC every last_ping looked hours old and
+// heartbeats never counted as "fresh". Normalize to ISO-8601 UTC before parsing.
+function parseSqliteUTC(value) {
+    if (!value) return NaN;
+    const iso = value.includes("T") ? value : `${value.replace(" ", "T")}Z`;
+    return new Date(iso).getTime();
+}
+
+// account_token proves the request actually came from that account's EA.
+// account_number alone is not a secret (it's visible in the MT5 terminal),
+// so any endpoint that trusts it without also checking the token can be
+// spoofed by anyone who knows/guesses a valid account number.
+function tokenMatches(account, token) {
+    return !!account && !!token && account.account_token === token;
+}
+
 function isHeartbeatFresh(lastPing, maxAgeSeconds = 30) {
     if (!lastPing) return false;
 
-    const lastPingDate = new Date(lastPing).getTime();
+    const lastPingDate = parseSqliteUTC(lastPing);
     if (Number.isNaN(lastPingDate)) return false;
 
     const maxAgeMs = maxAgeSeconds * 1000;
@@ -425,7 +559,7 @@ function isHeartbeatFresh(lastPing, maxAgeSeconds = 30) {
 exports.createCommand = (req, res) => {
     const { account_id, command, payload = null } = req.body;
 
-    const allowed = ["CLOSE_ALL", "CLOSE_BUY", "CLOSE_SELL", "DELETE_PENDING", "MODIFY_SL", "MODIFY_TP"];
+    const allowed = ["CLOSE_ALL", "CLOSE_BUY", "CLOSE_SELL", "CLOSE_PROFIT", "CLOSE_LOSS", "DELETE_PENDING", "MODIFY_SL", "MODIFY_TP", "DELETE_SL", "DELETE_TP", "OPEN_BUY", "OPEN_SELL"];
 
     if (!account_id || !allowed.includes(command)) {
         return res.status(400).json({ success: false, message: "Invalid command." });
@@ -450,65 +584,110 @@ exports.createCommand = (req, res) => {
     });
 };
 
-exports.status = (req, res) => {
-    const userId = req.user.id;
-
-    db.get(`
-        SELECT id, account_number, account_name, server_name, connected, last_ping
-        FROM mt_accounts
-        WHERE user_id = ?
-        ORDER BY id DESC
-        LIMIT 1
-    `, [userId], (err, account) => {
-        if (err) {
-            console.error("EA STATUS ERROR:", err);
-            return res.status(500).json({ success: false, message: err.message });
-        }
-
-        if (!account) return res.json({ success: true, connected: false, activated: false, account: null, role: "MEMBER", heartbeat: 5, command: null });
-
-        const isConnected = account.connected === 1 && isHeartbeatFresh(account.last_ping, 30);
-
-        if (account.connected === 1 && !isConnected) {
-            db.run(
-                `UPDATE mt_accounts SET connected = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-                [account.id]
-            );
-        }
-
+// Same lookup exports.status used to do inline, promisified so it can be
+// reused by both /status (kept for compatibility) and the combined
+// /dashboard endpoint without duplicating the three-query chain.
+function getAccountStatus(userId) {
+    return new Promise((resolve, reject) => {
         db.get(`
-            SELECT mt_accounts.ea_role, ea_settings.ea_enabled
+            SELECT id, account_number, account_name, server_name, broker, terminal_build, platform, connected, last_ping,
+                   symbol, point, digits, bid, ask
             FROM mt_accounts
-            LEFT JOIN ea_settings ON mt_accounts.user_id = ea_settings.user_id
-            WHERE mt_accounts.id = ?
-        `, [account.id], (roleErr, data) => {
-            if (roleErr) return res.status(500).json({ success: false, message: roleErr.message });
+            WHERE user_id = ?
+            ORDER BY id DESC
+            LIMIT 1
+        `, [userId], (err, account) => {
+            if (err) return reject(err);
+
+            if (!account) {
+                return resolve({ success: true, connected: false, activated: false, account: null, role: "MEMBER", heartbeat: 5, command: null });
+            }
+
+            const isConnected = account.connected === 1 && isHeartbeatFresh(account.last_ping, 30);
+
+            if (account.connected === 1 && !isConnected) {
+                db.run(
+                    `UPDATE mt_accounts SET connected = 0, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+                    [account.id]
+                );
+            }
 
             db.get(`
-                SELECT id, command, status, created_at, sent_at
-                FROM ea_commands
-                WHERE account_id = ? AND status IN ('pending', 'sent')
-                ORDER BY id DESC
-                LIMIT 1
-            `, [account.id], (commandErr, command) => {
-                if (commandErr) return res.status(500).json({ success: false, message: commandErr.message });
+                SELECT mt_accounts.ea_role, ea_settings.ea_enabled
+                FROM mt_accounts
+                LEFT JOIN ea_settings ON mt_accounts.user_id = ea_settings.user_id
+                WHERE mt_accounts.id = ?
+            `, [account.id], (roleErr, data) => {
+                if (roleErr) return reject(roleErr);
 
-                res.json({
-                    success: true,
-                    connected: isConnected,
-                    activated: data?.ea_enabled === 1 && isConnected,
-                    account: {
-                        ...account,
-                        connected: isConnected ? 1 : 0,
-                        last_ping: account.last_ping,
-                    },
-                    role: data?.ea_role || "MEMBER",
-                    heartbeat: 5,
-                    command: command || null,
+                // Show the most recent command regardless of status, so the
+                // tile reflects "executed"/"failed" instead of snapping back
+                // to "No command" the instant the EA acknowledges it.
+                db.get(`
+                    SELECT id, command, status, created_at, sent_at
+                    FROM ea_commands
+                    WHERE account_id = ?
+                    ORDER BY id DESC
+                    LIMIT 1
+                `, [account.id], (commandErr, command) => {
+                    if (commandErr) return reject(commandErr);
+
+                    resolve({
+                        success: true,
+                        connected: isConnected,
+                        activated: data?.ea_enabled === 1 && isConnected,
+                        account: {
+                            ...account,
+                            connected: isConnected ? 1 : 0,
+                            last_ping: account.last_ping,
+                        },
+                        role: data?.ea_role || "MEMBER",
+                        heartbeat: 5,
+                        command: command || null,
+                    });
                 });
             });
         });
     });
+}
+
+exports.status = async (req, res) => {
+    try {
+        const data = await getAccountStatus(req.user.id);
+        res.json(data);
+    } catch (err) {
+        console.error("EA STATUS ERROR:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// Combines status + positions + today's history into one round trip - the
+// dashboard used to poll three separate endpoints every 5s per open tab;
+// at thousands of concurrently open tabs that tripled request volume for
+// data that's cheap to fetch together.
+exports.dashboard = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const [statusData, positions, trades] = await Promise.all([
+            getAccountStatus(userId),
+            tradeService.getOpenPositions(userId),
+            tradeService.getTodayHistory(userId),
+        ]);
+
+        res.json({ ...statusData, positions, trades });
+    } catch (err) {
+        console.error("EA DASHBOARD ERROR:", err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+exports.positions = async (req, res) => {
+    try {
+        const rows = await tradeService.getOpenPositions(req.user.id);
+        res.json({ success: true, positions: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 };
 
 exports.getLastCommand = (req, res) => {
@@ -525,4 +704,13 @@ exports.getLastCommand = (req, res) => {
         if (err) return res.status(500).json({ success: false, message: err.message });
         res.json({ success: true, command: command || null });
     });
+};
+
+exports.getTodayHistory = async (req, res) => {
+    try {
+        const rows = await tradeService.getTodayHistory(req.user.id);
+        res.json({ success: true, trades: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
 };
